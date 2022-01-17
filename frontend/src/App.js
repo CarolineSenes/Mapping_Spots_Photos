@@ -12,6 +12,7 @@ function App() {
   const currentUser = "Caro";
   const [pins, setPins] = useState([]);
   const [currentPlaceId, setCurrentPlaceId] = useState(null);
+  const [newPlace, setNewPlace] = useState(null);
   const [viewport, setViewport] = useState({
     width: "100vw",
     height: "100vh",
@@ -36,6 +37,14 @@ function App() {
     setCurrentPlaceId(id)
   };
 
+  const handleAddClick = (e)=>{
+    const [long, lat] = e.lngLat;
+    setNewPlace({
+      lat,
+      long,
+    })
+  }
+
   return (
     <div className="App">
       <ReactMapGL
@@ -43,6 +52,7 @@ function App() {
         mapboxApiAccessToken={REACT_APP_MAPBOX_ACCESS_TOKEN}
         onViewportChange={(nextViewport) => setViewport(nextViewport)}
         mapStyle="mapbox://styles/mapbox/outdoors-v11"
+        onDblClick={handleAddClick}
       >
         {" "}
         {pins.map((p)=>(
@@ -67,20 +77,20 @@ function App() {
           onClose={()=>setCurrentPlaceId(null)}
         >
           <div className="card">
-            <label>Lieu</label>
-            <h4 className="place">{p.title}</h4>
-            <label>Review</label>
-            <p className="desc">{p.desc}</p>
-            <label>Note</label>
-            <div className="stars">
+            <label for="place">Lieu</label>
+            <h4 id="place" className="place">{p.title}</h4>
+            <label for="description">Description</label>
+            <p id="description" className="desc">{p.desc}</p>
+            <label for="rating">Note</label>
+            <div id="rating" className="stars">
               <Star className="star" />
               <Star className="star" />
               <Star className="star" />
               <Star className="star" />
               <Star className="star" />
             </div>
-            <label>Information</label>
-            <span className="username">
+            <label for="username">Information</label>
+            <span id="username" className="username">
               Créé par <b>{p.username}</b>
             </span>
             <span className="date">{format(p.createdAt)}</span>
@@ -88,7 +98,33 @@ function App() {
         </Popup>)}
         </>
         ))}
-
+        {newPlace && (
+        <Popup
+          latitude={newPlace.lat}
+          longitude={newPlace.long}
+          closeButton={true}
+          closeOnClick={false}
+          anchor="left"
+          onClose={()=>setNewPlace(null)}
+        >
+          <div>
+            <form>
+              <label for="place">Lieu</label>
+              <input type="text" name="place" id="place" placeholder="Entrer un nom du lieu" />
+              <label for="description">Description</label>
+              <textarea name="description" id="description" placeholder="Entrer une description" />
+              <label for="rating">Note</label>
+              <select id="rating">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+              <button className="submitButton" type="submit">Ajouter le lieu</button>
+            </form>
+          </div>
+        </Popup>)}
       </ReactMapGL>
     </div>
   );
