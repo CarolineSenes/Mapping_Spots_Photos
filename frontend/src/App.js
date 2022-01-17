@@ -13,6 +13,9 @@ function App() {
   const [pins, setPins] = useState([]);
   const [currentPlaceId, setCurrentPlaceId] = useState(null);
   const [newPlace, setNewPlace] = useState(null);
+  const [title, setTitle] = useState(null);
+  const [desc, setDesc] = useState(null);
+  const [rating, setRating] = useState(0);
   const [viewport, setViewport] = useState({
     width: "100vw",
     height: "100vh",
@@ -22,28 +25,48 @@ function App() {
   });
 
   useEffect(() => {
-    const getPins = async ()=>{
-      try{
+    const getPins = async () => {
+      try {
         const res = await axios.get("/pins");
         setPins(res.data);
-      }catch(err){
-        console.log(err)
+      } catch (err) {
+        console.log(err);
       }
-    }
-    getPins()
-  }, [])
+    };
+    getPins();
+  }, []);
 
-  const handleMarkerClick = (id)=>{
-    setCurrentPlaceId(id)
+  const handleMarkerClick = (id) => {
+    setCurrentPlaceId(id);
   };
 
-  const handleAddClick = (e)=>{
+  const handleAddClick = (e) => {
     const [long, lat] = e.lngLat;
     setNewPlace({
       lat,
       long,
-    })
-  }
+    });
+  };
+
+  const handleSubmit = async (e) =>{
+    e.preventDefault();
+    const newPin = {
+      username:currentUser,
+      title,
+      desc,
+      rating,
+      lat:newPlace.lat,
+      long:newPlace.long
+    }
+
+    try{
+      const res = await axios.post("/pins", newPin);
+      setPins([...pins,res.data]);
+      setNewPlace(null);
+    }catch(err){
+      console.log(err)
+    }
+  };
 
   return (
     <div className="App">
@@ -55,76 +78,99 @@ function App() {
         onDblClick={handleAddClick}
       >
         {" "}
-        {pins.map((p)=>(
-        <>
-        <Marker
-          latitude={p.lat}
-          longitude={p.long}
-          offsetLeft={-20}
-          offsetTop={-10}
-        >
-          <MyLocation style={{ color: p.username === currentUser ? "tomato" : "slateblue", cursor:"pointer" }} 
-            onClick={()=>handleMarkerClick(p._id)}
-          />
-        </Marker>
-        {p._id === currentPlaceId && (
-        <Popup
-          latitude={p.lat}
-          longitude={p.long}
-          closeButton={true}
-          closeOnClick={false}
-          anchor="left"
-          onClose={()=>setCurrentPlaceId(null)}
-        >
-          <div className="card">
-            <label for="place">Lieu</label>
-            <h4 id="place" className="place">{p.title}</h4>
-            <label for="description">Description</label>
-            <p id="description" className="desc">{p.desc}</p>
-            <label for="rating">Note</label>
-            <div id="rating" className="stars">
-              <Star className="star" />
-              <Star className="star" />
-              <Star className="star" />
-              <Star className="star" />
-              <Star className="star" />
-            </div>
-            <label for="username">Information</label>
-            <span id="username" className="username">
-              Créé par <b>{p.username}</b>
-            </span>
-            <span className="date">{format(p.createdAt)}</span>
-          </div>
-        </Popup>)}
-        </>
+        {pins.map((p) => (
+          <>
+            <Marker
+              latitude={p.lat}
+              longitude={p.long}
+              offsetLeft={-20}
+              offsetTop={-10}
+            >
+              <MyLocation
+                style={{
+                  color: p.username === currentUser ? "tomato" : "slateblue",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleMarkerClick(p._id)}
+              />
+            </Marker>
+            {p._id === currentPlaceId && (
+              <Popup
+                latitude={p.lat}
+                longitude={p.long}
+                closeButton={true}
+                closeOnClick={false}
+                anchor="left"
+                onClose={() => setCurrentPlaceId(null)}
+              >
+                <div className="card">
+                  <label for="place">Lieu</label>
+                  <h4 id="place" className="place">
+                    {p.title}
+                  </h4>
+                  <label for="description">Description</label>
+                  <p id="description" className="desc">
+                    {p.desc}
+                  </p>
+                  <label for="rating">Note</label>
+                  <div id="rating" className="stars">
+                    <Star className="star" />
+                    <Star className="star" />
+                    <Star className="star" />
+                    <Star className="star" />
+                    <Star className="star" />
+                  </div>
+                  <label for="username">Information</label>
+                  <span id="username" className="username">
+                    Créé par <b>{p.username}</b>
+                  </span>
+                  <span className="date">{format(p.createdAt)}</span>
+                </div>
+              </Popup>
+            )}
+          </>
         ))}
         {newPlace && (
-        <Popup
-          latitude={newPlace.lat}
-          longitude={newPlace.long}
-          closeButton={true}
-          closeOnClick={false}
-          anchor="left"
-          onClose={()=>setNewPlace(null)}
-        >
-          <div>
-            <form>
-              <label for="place">Lieu</label>
-              <input type="text" name="place" id="place" placeholder="Entrer un nom du lieu" />
-              <label for="description">Description</label>
-              <textarea name="description" id="description" placeholder="Entrer une description" />
-              <label for="rating">Note</label>
-              <select id="rating">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-              </select>
-              <button className="submitButton" type="submit">Ajouter le lieu</button>
-            </form>
-          </div>
-        </Popup>)}
+          <Popup
+            latitude={newPlace.lat}
+            longitude={newPlace.long}
+            closeButton={true}
+            closeOnClick={false}
+            anchor="left"
+            onClose={() => setNewPlace(null)}
+          >
+            <div>
+              <form onSubmit={handleSubmit}>
+                <label for="place">Lieu</label>
+                <input
+                  type="text"
+                  name="place"
+                  id="place"
+                  placeholder="Entrer un nom du lieu"
+                  onChange={(e)=>setTitle(e.target.value)}
+                />
+                <label for="description">Description</label>
+                <textarea
+                  name="description"
+                  id="description"
+                  placeholder="Entrer une description"
+                  onChange={(e)=>setDesc(e.target.value)}
+                />
+                <label for="rating">Note</label>
+                <select id="rating" onChange={(e)=>setRating(e.target.value)}>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+                <button className="submitButton" type="submit">
+                  Ajouter le lieu
+                </button>
+              </form>
+            </div>
+          </Popup>
+        )}
       </ReactMapGL>
     </div>
   );
