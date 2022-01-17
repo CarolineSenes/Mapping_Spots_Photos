@@ -6,14 +6,14 @@ import "./register.css";
 export default function Register({setShowRegister}) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
-  const nameRef = useRef();
+  const usernameRef = useRef();
   const emailRef = useRef();
   const passwordRef = useRef();
 
   const handelSubmit = async (e) => {
     e.preventDefault();
     const newUser = {
-      username: nameRef.current.value,
+      username: usernameRef.current.value,
       email: emailRef.current.value,
       password: passwordRef.current.value,
     };
@@ -31,23 +31,22 @@ export default function Register({setShowRegister}) {
     <div className="registerContainer">
       <div className="logo">
         <MyLocation />
-        Spots Photos App
+        <span>Spots Photos App</span>
       </div>
       <form onSubmit={handelSubmit}>
         <input
-          ref={nameRef}
-          id="username"
+          ref={usernameRef}
           type="text"
           placeholder="nom d'utilisateur"
         />
         <input ref={emailRef} id="email" type="email" placeholder="email" />
         <input
           ref={passwordRef}
-          id="password"
           type="password"
           placeholder="mot de passe"
+          min="6"
         />
-        <button className="registerBtn">S'enregistrer</button>
+        <button className="registerBtn" type="submit">S'enregistrer</button>
         {success && (
           <span className="success">
             BRAVO! Vous pouvez vous connecter maintenant!

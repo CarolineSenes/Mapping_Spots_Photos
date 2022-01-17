@@ -4,7 +4,6 @@ const bcrypt = require("bcrypt");
 
 //register
 router.post("/register", async (req, res) => {
-  const newUser = new User(req.body);
   try {
     //génère nouveau pssword et le hash
     const salt = await bcrypt.genSalt(10);
@@ -19,7 +18,7 @@ router.post("/register", async (req, res) => {
 
     //save le user + envoyer res
     const user = await newUser.save();
-    res.status(200).json("Compte créé pour " + user.username + " !");
+    res.status(200).json(user._id);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -40,7 +39,7 @@ router.post("/login", async (req, res) => {
             !validPassword && res.status(400).json("Login ou Password incorrect");
 
         //envoyer res
-        res.status(200).json("Ola " + user.username + " !");
+        res.status(200).json({ _id: user._id, username: user.username });
     } catch (err) {
       res.status(500).json(err);
     }

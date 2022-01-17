@@ -11,7 +11,8 @@ const REACT_APP_MAPBOX_ACCESS_TOKEN =
   "pk.eyJ1IjoiY2Fyb2xpbmVzZW5lcyIsImEiOiJja3lnNTNlbXIxcGEwMnZwYnd1dmNwZG9vIn0.qstETxxcAmij4x9d9bN1ew";
 
 function App() {
-  const [currentUser, setCurrentUser] = useState(null);
+  const myStorage = window.localStorage;
+  const [currentUsername, setCurrentUsername] = useState(myStorage.getItem("user"));
   const [pins, setPins] = useState([]);
   const [currentPlaceId, setCurrentPlaceId] = useState(null);
   const [newPlace, setNewPlace] = useState(null);
@@ -55,7 +56,7 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newPin = {
-      username: currentUser,
+      username: currentUsername,
       title,
       desc,
       rating,
@@ -71,6 +72,11 @@ function App() {
       console.log(err);
     }
   };
+
+  const handleLogout = ()=>{
+    myStorage.removeItem("user");
+    setCurrentUsername(null);
+  }
 
   return (
     <div className="App">
@@ -92,7 +98,8 @@ function App() {
             >
               <MyLocation
                 style={{
-                  color: p.username === currentUser ? "tomato" : "slateblue",
+                  color:
+                    p.username === currentUsername ? "tomato" : "slateblue",
                   cursor: "pointer",
                 }}
                 onClick={() => handleMarkerClick(p._id)}
@@ -108,20 +115,16 @@ function App() {
                 onClose={() => setCurrentPlaceId(null)}
               >
                 <div className="card">
-                  <label for="place">Lieu</label>
-                  <h4 id="place" className="place">
-                    {p.title}
-                  </h4>
-                  <label for="description">Description</label>
-                  <p id="description" className="desc">
-                    {p.desc}
-                  </p>
-                  <label for="rating">Note</label>
-                  <div id="rating" className="stars">
+                  <label>Lieu</label>
+                  <h4 className="place">{p.title}</h4>
+                  <label>Description</label>
+                  <p className="desc">{p.desc}</p>
+                  <label>Note</label>
+                  <div className="stars">
                     {Array(p.rating).fill(<Star className="star" />)}
                   </div>
-                  <label for="username">Information</label>
-                  <span id="username" className="username">
+                  <label>Information</label>
+                  <span className="username">
                     Créé par <b>{p.username}</b>
                   </span>
                   <span className="date">{format(p.createdAt)}</span>
@@ -141,26 +144,23 @@ function App() {
           >
             <div>
               <form onSubmit={handleSubmit}>
-                <label for="place">Lieu</label>
+                <label>Lieu</label>
                 <input
                   type="text"
                   name="place"
-                  id="place"
                   placeholder="Entrer un nom du lieu"
+                  autoFocus
                   onChange={(e) => setTitle(e.target.value)}
                 />
-                <label for="description">Description</label>
+                <label>Description</label>
                 <textarea
                   name="description"
-                  id="description"
                   placeholder="Entrer une description"
                   onChange={(e) => setDesc(e.target.value)}
                 />
-                <label for="rating">Note</label>
-                <select id="rating" onChange={(e) => setRating(e.target.value)}>
-                  <option selected="selected" value="1">
-                    1
-                  </option>
+                <label>Note</label>
+                <select onChange={(e) => setRating(e.target.value)}>
+                  <option value="1">1</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
                   <option value="4">4</option>
@@ -173,8 +173,8 @@ function App() {
             </div>
           </Popup>
         )}
-        {currentUser ? (
-          <button className="button logout">Déconnexion</button>
+        {currentUsername ? (
+          <button className="button logout" onClick={handleLogout}>Déconnexion</button>
         ) : (
           <div className="buttons">
             <button className="button login" onClick={() => setShowLogin(true)}>
@@ -189,7 +189,13 @@ function App() {
           </div>
         )}
         {showRegister && <Register setShowRegister={setShowRegister} />}
-        {showLogin && <Login setShowLogin={setShowLogin} />}
+        {showLogin && (
+          <Login
+            setShowLogin={setShowLogin}
+            myStorage={myStorage}
+            setCurrentUsername={setCurrentUsername}
+          />
+        )}
       </ReactMapGL>
     </div>
   );

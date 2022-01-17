@@ -3,21 +3,23 @@ import axios from "axios";
 import { useState, useRef } from "react";
 import "./login.css";
 
-export default function Login({setShowLogin}) {
+export default function Login({setShowLogin, myStorage, setCurrentUsername}) {
   const [error, setError] = useState(false);
-  const nameRef = useRef();
+  const usernameRef = useRef();
   const passwordRef = useRef();
 
   const handelSubmit = async (e) => {
     e.preventDefault();
     const user = {
-      username: nameRef.current.value,
+      username: usernameRef.current.value,
       password: passwordRef.current.value,
     };
 
     try{
-        await axios.post("/users/login", user);
-        setError(false);
+        const res = await axios.post("/users/login", user);
+        myStorage.setItem("user", res.data.username)
+        setCurrentUsername(res.data.username)
+        setShowLogin(false);
     }catch(err){
         setError(true);
     }
@@ -27,22 +29,22 @@ export default function Login({setShowLogin}) {
     <div className="loginContainer">
       <div className="logo">
         <MyLocation />
-        Spots Photos App
+        <span>Spots Photos App</span>
       </div>
       <form onSubmit={handelSubmit}> 
         <input
-          ref={nameRef}
-          id="username"
+          ref={usernameRef}
           type="text"
           placeholder="nom d'utilisateur"
+          autoFocus
         />
         <input
           ref={passwordRef}
-          id="password"
           type="password"
           placeholder="mot de passe"
+          min="6"
         />
-        <button className="loginBtn">Se connecter</button>
+        <button className="loginBtn" type="submit">Se connecter</button>
         {error && (
           <span className="failure">Quelque chose n'a pas fonctionné!</span>
         )}
