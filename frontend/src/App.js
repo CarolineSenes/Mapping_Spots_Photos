@@ -4,18 +4,22 @@ import { MyLocation, Star } from "@mui/icons-material";
 import "./app.css";
 import axios from "axios";
 import { format } from "timeago.js";
+import Register from "./components/register/Register";
+import Login from "./components/login/Login";
 
 const REACT_APP_MAPBOX_ACCESS_TOKEN =
   "pk.eyJ1IjoiY2Fyb2xpbmVzZW5lcyIsImEiOiJja3lnNTNlbXIxcGEwMnZwYnd1dmNwZG9vIn0.qstETxxcAmij4x9d9bN1ew";
 
 function App() {
-  const currentUser = "Caro";
+  const [currentUser, setCurrentUser] = useState(null);
   const [pins, setPins] = useState([]);
   const [currentPlaceId, setCurrentPlaceId] = useState(null);
   const [newPlace, setNewPlace] = useState(null);
   const [title, setTitle] = useState(null);
   const [desc, setDesc] = useState(null);
   const [rating, setRating] = useState(0);
+  const [showRegister, setShowRegister] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   const [viewport, setViewport] = useState({
     width: "100vw",
     height: "100vh",
@@ -48,23 +52,23 @@ function App() {
     });
   };
 
-  const handleSubmit = async (e) =>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newPin = {
-      username:currentUser,
+      username: currentUser,
       title,
       desc,
       rating,
-      lat:newPlace.lat,
-      long:newPlace.long
-    }
+      lat: newPlace.lat,
+      long: newPlace.long,
+    };
 
-    try{
+    try {
       const res = await axios.post("/pins", newPin);
-      setPins([...pins,res.data]);
+      setPins([...pins, res.data]);
       setNewPlace(null);
-    }catch(err){
-      console.log(err)
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -143,18 +147,20 @@ function App() {
                   name="place"
                   id="place"
                   placeholder="Entrer un nom du lieu"
-                  onChange={(e)=>setTitle(e.target.value)}
+                  onChange={(e) => setTitle(e.target.value)}
                 />
                 <label for="description">Description</label>
                 <textarea
                   name="description"
                   id="description"
                   placeholder="Entrer une description"
-                  onChange={(e)=>setDesc(e.target.value)}
+                  onChange={(e) => setDesc(e.target.value)}
                 />
                 <label for="rating">Note</label>
-                <select id="rating" onChange={(e)=>setRating(e.target.value)}>
-                  <option selected="selected" value="1">1</option>
+                <select id="rating" onChange={(e) => setRating(e.target.value)}>
+                  <option selected="selected" value="1">
+                    1
+                  </option>
                   <option value="2">2</option>
                   <option value="3">3</option>
                   <option value="4">4</option>
@@ -167,6 +173,23 @@ function App() {
             </div>
           </Popup>
         )}
+        {currentUser ? (
+          <button className="button logout">Déconnexion</button>
+        ) : (
+          <div className="buttons">
+            <button className="button login" onClick={() => setShowLogin(true)}>
+              Connexion
+            </button>
+            <button
+              className="button register"
+              onClick={() => setShowRegister(true)}
+            >
+              S'enregistrer
+            </button>
+          </div>
+        )}
+        {showRegister && <Register setShowRegister={setShowRegister} />}
+        {showLogin && <Login setShowLogin={setShowLogin} />}
       </ReactMapGL>
     </div>
   );
