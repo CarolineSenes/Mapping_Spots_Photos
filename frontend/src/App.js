@@ -7,9 +7,6 @@ import { format } from "timeago.js";
 import Register from "./components/register/Register";
 import Login from "./components/login/Login";
 
-const REACT_APP_MAPBOX_ACCESS_TOKEN =
-  "pk.eyJ1IjoiY2Fyb2xpbmVzZW5lcyIsImEiOiJja3lnNTNlbXIxcGEwMnZwYnd1dmNwZG9vIn0.qstETxxcAmij4x9d9bN1ew";
-
 function App() {
   const myStorage = window.localStorage;
   const [currentUsername, setCurrentUsername] = useState(myStorage.getItem("user"));
@@ -82,7 +79,7 @@ function App() {
     <div className="App">
       <ReactMapGL
         {...viewport}
-        mapboxApiAccessToken={REACT_APP_MAPBOX_ACCESS_TOKEN}
+        mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
         onViewportChange={(nextViewport) => setViewport(nextViewport)}
         mapStyle="mapbox://styles/mapbox/outdoors-v11"
         onDblClick={handleAddClick}
