@@ -19,6 +19,7 @@ function App() {
         {...viewport}
         mapboxApiAccessToken={REACT_APP_MAPBOX_ACCESS_TOKEN}
         onViewportChange={(nextViewport) => setViewport(nextViewport)}
+        mapStyle="mapbox://styles/mapbox/satellite-v9"
       >
         {" "}
         <Marker
@@ -27,7 +28,7 @@ function App() {
           offsetLeft={-20}
           offsetTop={-10}
         >
-          <MyLocation style={{ color:"slateblue" }}/>
+          <MyLocation style={{ color:"red" }}/>
         </Marker>
       </ReactMapGL>
     </div>
