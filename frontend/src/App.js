@@ -114,11 +114,7 @@ function App() {
                   </p>
                   <label for="rating">Note</label>
                   <div id="rating" className="stars">
-                    <Star className="star" />
-                    <Star className="star" />
-                    <Star className="star" />
-                    <Star className="star" />
-                    <Star className="star" />
+                    {Array(p.rating).fill(<Star className="star" />)}
                   </div>
                   <label for="username">Information</label>
                   <span id="username" className="username">
@@ -158,7 +154,7 @@ function App() {
                 />
                 <label for="rating">Note</label>
                 <select id="rating" onChange={(e)=>setRating(e.target.value)}>
-                  <option value="1">1</option>
+                  <option selected="selected" value="1">1</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
                   <option value="4">4</option>
