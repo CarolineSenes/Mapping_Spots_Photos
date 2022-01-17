@@ -1,5 +1,6 @@
 import { useState } from "react";
-import ReactMapGL from "react-map-gl";
+import ReactMapGL, { Marker } from "react-map-gl";
+import { MyLocation } from '@mui/icons-material';
 
 const REACT_APP_MAPBOX_ACCESS_TOKEN =
   "pk.eyJ1IjoiY2Fyb2xpbmVzZW5lcyIsImEiOiJja3lnNTNlbXIxcGEwMnZwYnd1dmNwZG9vIn0.qstETxxcAmij4x9d9bN1ew";
@@ -20,6 +21,14 @@ function App() {
         onViewportChange={(nextViewport) => setViewport(nextViewport)}
       >
         {" "}
+        <Marker
+          latitude={48.5734053}
+          longitude={7.7521113}
+          offsetLeft={-20}
+          offsetTop={-10}
+        >
+          <MyLocation style={{ color:"slateblue" }}/>
+        </Marker>
       </ReactMapGL>
     </div>
   );
